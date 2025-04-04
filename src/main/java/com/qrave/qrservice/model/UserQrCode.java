@@ -12,58 +12,28 @@ public class UserQrCode {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "user_id", nullable = false, unique = true)
     private Long userId;
 
-    @Column(name = "qr_code", columnDefinition = "TEXT", nullable = false)
+    @Column(columnDefinition = "TEXT") // si el QR es muy largo
     private String qrCode;
 
-    @Column(name = "last_regeneration")
     private LocalDateTime lastRegeneration;
 
+    public Long getId() { return id; }
 
-    // Constructor vacío
-    public UserQrCode() {}
+    public void setId(Long id) { this.id = id; }
 
-    // Constructor completo
-    public UserQrCode(Long userId, String qrCode) {
-        this.userId = userId;
-        this.qrCode = qrCode;
-        this.lastRegeneration = lastRegeneration;
-    }
+    public Long getUserId() { return userId; }
 
-    // Getters y Setters
+    public void setUserId(Long userId) { this.userId = userId; }
 
+    public String getQrCode() { return qrCode; }
 
-    public LocalDateTime getLastRegeneration() {
-        return lastRegeneration;
-    }
+    public void setQrCode(String qrCode) { this.qrCode = qrCode; }
+
+    public LocalDateTime getLastRegeneration() { return lastRegeneration; }
 
     public void setLastRegeneration(LocalDateTime lastRegeneration) {
         this.lastRegeneration = lastRegeneration;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public Long getUserId() {
-        return userId;
-    }
-
-    public String getQrCode() {
-        return qrCode;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public void setUserId(Long userId) {
-        this.userId = userId;
-    }
-
-    public void setQrCode(String qrCode) {
-        this.qrCode = qrCode;
     }
 }

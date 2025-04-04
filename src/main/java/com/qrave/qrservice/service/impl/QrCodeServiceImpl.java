@@ -8,7 +8,9 @@ import com.google.zxing.common.BitMatrix;
 import com.qrave.qrservice.model.UserQrCode;
 import com.qrave.qrservice.repository.UserQrCodeRepository;
 import com.qrave.qrservice.service.QrCodeService;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.io.ByteArrayOutputStream;
 import java.time.LocalDateTime;
@@ -51,7 +53,7 @@ public class QrCodeServiceImpl implements QrCodeService {
 
         LocalDateTime lastRegeneration = qr.getLastRegeneration();
         if (lastRegeneration != null && lastRegeneration.plusHours(24).isAfter(LocalDateTime.now())) {
-            throw new RuntimeException("El código QR solo puede regenerarse una vez cada 24 horas.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El código QR solo puede regenerarse una vez cada 24 horas.");
         }
 
         String newBase64Qr = generateQrBase64("qrave-user-" + userId + "-" + System.currentTimeMillis());
