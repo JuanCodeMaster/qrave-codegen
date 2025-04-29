@@ -9,5 +9,5 @@ RUN mvn package
 
 FROM amazoncorretto:21
 COPY --from=builder /api/target/*.jar app.jar
-EXPOSE 8083
+EXPOSE 8081
 CMD ["java" ,"-jar", "app.jar"]
