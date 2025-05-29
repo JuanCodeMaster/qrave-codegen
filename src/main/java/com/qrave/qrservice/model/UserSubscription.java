@@ -17,6 +17,7 @@ public class UserSubscription {
     private String status;
     private String messageId;
     private String clientId;
+    @Column(name = "created_at")
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
