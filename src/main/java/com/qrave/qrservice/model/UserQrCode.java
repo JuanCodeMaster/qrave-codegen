@@ -14,10 +14,15 @@ public class UserQrCode {
 
     private Long userId;
 
-    @Column(columnDefinition = "TEXT") // si el QR es muy largo
+    @Column(columnDefinition = "TEXT")
     private String qrCode;
 
     private LocalDateTime lastRegeneration;
+
+    @Column(name = "payment_password")
+    private String paymentPassword; // ✅ Campo para la contraseña de pago encriptada
+
+    // Getters y setters
 
     public Long getId() { return id; }
 
@@ -35,5 +40,13 @@ public class UserQrCode {
 
     public void setLastRegeneration(LocalDateTime lastRegeneration) {
         this.lastRegeneration = lastRegeneration;
+    }
+
+    public String getPaymentPassword() {
+        return paymentPassword;
+    }
+
+    public void setPaymentPassword(String paymentPassword) {
+        this.paymentPassword = paymentPassword;
     }
 }
