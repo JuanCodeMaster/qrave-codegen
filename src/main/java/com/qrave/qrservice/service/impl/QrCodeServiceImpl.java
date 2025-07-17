@@ -117,6 +117,7 @@ public class QrCodeServiceImpl implements QrCodeService {
         dto.setCode("NIT_1");
         dto.setSubscriptionToken(latestSubscription.getSubscriptionToken());
         dto.setFullName(user.getFullName());
+        dto.setUserId(userId);
 
         return dto;
     }
