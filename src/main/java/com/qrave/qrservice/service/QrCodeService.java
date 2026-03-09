@@ -7,3 +7,4 @@ public interface QrCodeService {
     UserQrCode getQrCode(Long userId);
     UserQrCode regenerateQrCode(Long userId);
 }
+
