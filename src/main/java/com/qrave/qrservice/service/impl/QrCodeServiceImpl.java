@@ -88,10 +88,14 @@ public class QrCodeServiceImpl implements QrCodeService {
 
         if (qr.getLastRegeneration() != null &&
                 qr.getLastRegeneration().plusHours(24).isAfter(LocalDateTime.now())) {
+<<<<<<< HEAD
             throw new ResponseStatusException(
                     HttpStatus.TOO_MANY_REQUESTS,
                     "El código QR solo puede regenerarse una vez cada 24 horas."
             );
+=======
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El código QR solo puede regenerarse una vez cada 24 horas.");
+>>>>>>> d3de28c7a3883a1afe94361171aaea26b0660063
         }
 
         QrSubscriptionDataDTO paymentData = preparePaymentDataFromUserId(userId);
@@ -101,6 +105,11 @@ public class QrCodeServiceImpl implements QrCodeService {
 
         qr.setQrCode(base64Qr);
         qr.setLastRegeneration(LocalDateTime.now());
+<<<<<<< HEAD
+=======
+
+        // 🚨 Se resetea la contraseña siempre que se regenere
+>>>>>>> d3de28c7a3883a1afe94361171aaea26b0660063
         qr.setPaymentPassword(null);
 
         return repository.save(qr);

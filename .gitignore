@@ -31,5 +31,8 @@ build/
 
 ### VS Code ###
 .vscode/
+<<<<<<< HEAD
 
 .qodo
+=======
+>>>>>>> d3de28c7a3883a1afe94361171aaea26b0660063

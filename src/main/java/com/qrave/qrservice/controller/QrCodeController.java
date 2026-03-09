@@ -73,8 +73,11 @@ public class QrCodeController {
         return ResponseEntity.ok("Contraseña válida");
     }
 
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> d3de28c7a3883a1afe94361171aaea26b0660063
     private String hashPassword(String password) {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
