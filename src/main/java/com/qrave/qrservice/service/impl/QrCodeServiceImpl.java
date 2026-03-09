@@ -116,6 +116,7 @@ public class QrCodeServiceImpl implements QrCodeService {
         return dto;
     }
 
+
     private String convertToJson(QrSubscriptionDataDTO dto) {
         try {
             ObjectMapper mapper = new ObjectMapper();
