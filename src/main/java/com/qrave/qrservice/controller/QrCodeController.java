@@ -74,6 +74,7 @@ public class QrCodeController {
     }
 
 
+
     private String hashPassword(String password) {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
