@@ -30,6 +30,8 @@ import java.util.Optional;
 @Service
 public class QrCodeServiceImpl implements QrCodeService {
 
+    private static final String DEFAULT_NEQUI_CODE = "NIT_1";
+
     private final UserQrCodeRepository repository;
     private final UserRepository userRepository;
     private final UserSubscriptionRepository userSubscriptionRepository;
@@ -53,10 +55,9 @@ public class QrCodeServiceImpl implements QrCodeService {
             return existing.get();
         }
 
-        QrSubscriptionDataDTO paymentData = preparePaymentDataFromUserId(userId);
-        String metadataJson = convertToJson(paymentData);
-        String encryptedMetadata = encrypt(metadataJson, encryptionKey);
-        String base64Qr = generateQrBase64(encryptedMetadata);
+        validateUserHasActiveSubscription(userId);
+
+        String base64Qr = buildQrBase64ForUser(userId);
 
         UserQrCode qr = new UserQrCode();
         qr.setUserId(userId);
@@ -69,8 +70,13 @@ public class QrCodeServiceImpl implements QrCodeService {
 
     @Override
     public UserQrCode getQrCode(Long userId) {
-        return repository.findByUserId(userId)
+        UserQrCode qr = repository.findByUserId(userId)
                 .orElseThrow(() -> new RuntimeException("Código QR no encontrado"));
+
+        // Validación básica para no devolver QR a usuarios sin suscripción activa local
+        validateUserHasActiveSubscription(userId);
+
+        return qr;
     }
 
     @Override
@@ -86,10 +92,9 @@ public class QrCodeServiceImpl implements QrCodeService {
             );
         }
 
-        QrSubscriptionDataDTO paymentData = preparePaymentDataFromUserId(userId);
-        String metadataJson = convertToJson(paymentData);
-        String encryptedMetadata = encrypt(metadataJson, encryptionKey);
-        String base64Qr = generateQrBase64(encryptedMetadata);
+        validateUserHasActiveSubscription(userId);
+
+        String base64Qr = buildQrBase64ForUser(userId);
 
         qr.setQrCode(base64Qr);
         qr.setLastRegeneration(LocalDateTime.now());
@@ -98,24 +103,46 @@ public class QrCodeServiceImpl implements QrCodeService {
         return repository.save(qr);
     }
 
+    private void validateUserHasActiveSubscription(Long userId) {
+        UserSubscription latestSubscription = userSubscriptionRepository
+                .findTopByUserIdOrderByUpdatedAtDesc(userId)
+                .orElseThrow(() -> new RuntimeException("No se encontró ninguna suscripción para el usuario"));
+
+        if (latestSubscription.getStatus() == null ||
+                !"ACCEPTED".equalsIgnoreCase(latestSubscription.getStatus())) {
+            throw new RuntimeException("El usuario no tiene una suscripción activa de Nequi");
+        }
+    }
+
+    private String buildQrBase64ForUser(Long userId) {
+        QrSubscriptionDataDTO paymentData = preparePaymentDataFromUserId(userId);
+        String metadataJson = convertToJson(paymentData);
+        String encryptedMetadata = encrypt(metadataJson, encryptionKey);
+        return generateQrBase64(encryptedMetadata);
+    }
+
     private QrSubscriptionDataDTO preparePaymentDataFromUserId(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
+        // Solo se valida que tenga una suscripción local activa.
+        // Ya NO se mete el token de suscripción dentro del QR.
         UserSubscription latestSubscription = userSubscriptionRepository
                 .findTopByUserIdOrderByUpdatedAtDesc(userId)
-                .orElseThrow(() -> new RuntimeException("No se encontró una suscripción activa para el usuario"));
+                .orElseThrow(() -> new RuntimeException("No se encontró una suscripción para el usuario"));
+
+        if (latestSubscription.getStatus() == null ||
+                !"ACCEPTED".equalsIgnoreCase(latestSubscription.getStatus())) {
+            throw new RuntimeException("El usuario no tiene una suscripción activa de Nequi");
+        }
 
         QrSubscriptionDataDTO dto = new QrSubscriptionDataDTO();
-        dto.setPhoneNumber(user.getPhoneNumber());
-        dto.setCode("NIT_1");
-        dto.setSubscriptionToken(latestSubscription.getSubscriptionToken());
-        dto.setFullName(user.getFullName());
         dto.setUserId(userId);
+        dto.setFullName(user.getFullName());
+        dto.setCode(DEFAULT_NEQUI_CODE);
 
         return dto;
     }
-
 
     private String convertToJson(QrSubscriptionDataDTO dto) {
         try {
